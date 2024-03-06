@@ -20,17 +20,27 @@ const DUMMY_DATA = require('../data/dummy-data');
 //       },
 //       settings: {},
 //       posts: [],
-//       history: []
+//       history: [],
+//       loggedIn: true
 //     }
 //   ]
 // }
 
-
-router.get('/user/:uid', (req, res, next) => {
-  const userID = req.params.uid;
-  const user = DUMMY_DATA.users.find(user => user.id === userID)
-  console.log('GET Request in Users');
+router.get('/all', (req, res, next) => {
+  const all = DUMMY_DATA.users;
  
+  if (!all) {
+    const error = new HttpError('Could not find a user with the given userID', 404);
+    return next(error);
+  }
+
+  res.json({ all });
+});
+
+router.patch('/login', (req, res, next) => {
+  const userID = req.body.id;
+  let user = DUMMY_DATA.users.find(user => user.id === userID);
+  user.loggedIn = !user.loggedIn;
 
   if (!user) {
     const error = new HttpError('Could not find a user with the given userID', 404);
@@ -39,5 +49,19 @@ router.get('/user/:uid', (req, res, next) => {
 
   res.json({ user });
 })
+
+router.get('/user/:uid', (req, res, next) => {
+  const userID = req.params.uid;
+  const user = DUMMY_DATA.users.find(user => user.id === userID)
+ 
+  if (!user) {
+    const error = new HttpError('Could not find a user with the given userID', 404);
+    return next(error);
+  }
+
+  res.json({ user });
+});
+
+
 
 module.exports = router;

@@ -12,7 +12,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: true
     },
     {
       id: 'u2',
@@ -26,7 +27,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     },
     {
       id: 'u3',
@@ -40,7 +42,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     },
     {
       id: 'u4',
@@ -54,7 +57,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     },
     {
       id: 'u5',
@@ -68,7 +72,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     },
     {
       id: 'u6',
@@ -82,7 +87,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     },
     {
       id: 'u7',
@@ -96,7 +102,8 @@ const DUMMY_DATA = {
       },
       settings: {},
       posts: [],
-      history: []
+      history: [],
+      loggedIn: false
     }
   ],
   general: {
