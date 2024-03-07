@@ -4,26 +4,31 @@ const SignUp = require('../models/sign-up');
 // const DUMMY_DATA = require('../data/dummy-data');
 let DUMMY_DATA = require('../data/dummy-data');
 
-// const DUMMY_DATA = {
-//   users: [
-//     {
-//       id: 'u1',
-//       userName: 'SaveJarvis',
-//       details: {
-//         firstName: 'Jarvis',
-//         lastName: 'Considine',
-//         email: 'jarvis@considine.com',
-//         password: 'test123!',
-//         created: Date.now(),
-//         status: active
-//       },
-//       settings: {},
-//       posts: [],
-//       history: [],
-//       loggedIn: true
-//     }
-//   ]
-// }
+    // userID: 'u1',
+    // userName: 'SaveJarvis',
+    // loggedIn: true,
+    // details: {
+    //   firstName: 'Jarvis',
+    //   lastName: 'Considine',
+    //   email: 'jarvis@considine.com',
+    //   password: 'Test123!',
+    //   created: 1709833769253,
+    //   status: "active"
+    // },
+    // settings: {
+    //   privacy: {},
+    //   messaging: {},
+    //   notifications: {}
+    // },
+    // posts: [],
+    // history: [
+    //   {
+    //     historyID: 'h' + '1709833769253',
+    //     interactionChain: ['u1', 'u1'],
+    //     action: 'login',
+    //     time: 1709833769253
+    //   }
+    // ]
 
 const getAllUsers = (req, res, next) => {
   const users = DUMMY_DATA.users;

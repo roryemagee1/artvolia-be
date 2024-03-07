@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use('/api/users', usersRoutes);
+app.use('/api', usersRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find the requested route.', 404);
