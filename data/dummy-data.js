@@ -30,7 +30,7 @@ const DUMMY_DATA = {
       history: [],
       loggedIn: false
     },
-    {
+   {
       id: 'u3',
       userName: 'JaneAnderson',
       details: {

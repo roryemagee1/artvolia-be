@@ -66,7 +66,7 @@ const signUpUser = (req, res, next) => {
   DUMMY_DATA.users.push(newUser);
   console.log(DUMMY_DATA);
 
-  res.json({ newUser });
+  res.status(201).json({ newUser });
 }
 
 

@@ -1,6 +1,8 @@
+const uuid = require('uuid');
+
 class SignUp {
   constructor({ email, userName, firstName, lastName, password }) {
-    this.id = 'u' + Date.now().toString();
+    this.id = 'u' + uuid.v4();
     this.userName = userName;
     this.details = {
       firstName: firstName,
