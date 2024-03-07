@@ -5,15 +5,15 @@ class SignUp {
     this.userID = 'u' + uuid.v4();
     this.userName = userName;
     this.loggedIn = true;
-    this.details = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      created: Date.now(),
-      status: 'active'
-    }
     this.settings = {
+      information: {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        created: Date.now(),
+        status: 'active'
+      },
       privacy: {
         profileVisibility: 'public',
         postVisibilityDefault: 'public',
@@ -34,7 +34,7 @@ class SignUp {
         historyID: 'h' + uuid.v4(),
         interactionChain: [this.userID, this.userID],
         action: 'login',
-        time: this.details.created
+        time: this.settings.information.created
       }
     ];
   }
@@ -50,15 +50,15 @@ Data Template:
   userID: 'u1',
   userName: 'SaveJarvis',
   loggedIn: true,
-  details: {
-    firstName: 'Jarvis',
-    lastName: 'Considine',
-    email: 'jarvis@considine.com',
-    password: 'test123!',
-    created: Date.now(),
-    userStatus: "active" | "deleted"
-  },
   settings: {
+    information: {
+      firstName: 'Jarvis',
+      lastName: 'Considine',
+      email: 'jarvis@considine.com',
+      password: 'test123!',
+      created: Date.now(),
+      userStatus: "active" | "deleted"
+    },
     privacy: {
       profileVisibility: 'private' | 'friends' | 'public',
       postVisibilityDefault: 'private' | 'friends' | 'public',

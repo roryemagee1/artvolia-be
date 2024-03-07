@@ -27,15 +27,15 @@ const DUMMY_DATA = {
       userID: 'u1',
       userName: 'SaveJarvis',
       loggedIn: true,
-      details: {
-        firstName: 'Jarvis',
-        lastName: 'Considine',
-        email: 'jarvis@considine.com',
-        password: 'Test123!',
-        created: 1709833769253,
-        status: "active"
-      },
       settings: {
+        information: {
+          firstName: 'Jarvis',
+          lastName: 'Considine',
+          email: 'jarvis@considine.com',
+          password: 'Test123!',
+          created: 1709833769253,
+          status: "active"
+        },
         privacy: {},
         messaging: {},
         notifications: {}
@@ -49,7 +49,6 @@ const DUMMY_DATA = {
           time: 1709833769253
         }
       ],
-      loggedIn: true
     },
     user2,
     user3,
