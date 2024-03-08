@@ -59,9 +59,7 @@ const loginUser = (req, res, next) => {
   const password = req.body.password;
 
   const user = DUMMY_DATA.users.find(user => user.userName === userName);
-  console.log(user);
   const userIndex = DUMMY_DATA.users.findIndex(user => user.userName === userName);
-  console.log(userIndex);
 
   if (userIndex === -1 || user.settings.information.password !== password) {
     const error = new HttpError('Could not find a user with the given username and password.', 401);
@@ -77,7 +75,19 @@ const loginUser = (req, res, next) => {
 }
 
 const signUpUser = (req, res, next) => {
-  const newUser = new SignUp(req.body)
+  const { email, userName, firstName, lastName, password } = req.body;
+  
+  console.log(DUMMY_DATA);
+  const userIndex = DUMMY_DATA.users.findIndex(user => user.userName === userName);
+  console.log(userIndex);
+
+  if (userIndex !== -1) {
+    const error = new HttpError('That username is already in use.', 401);
+    return next(error);
+  }
+  
+  const newUser = new SignUp(email, userName, firstName, lastName, password);
+  console.log(newUser);
   DUMMY_DATA.users.push(newUser);
 
   res.status(201).json({ newUser });
@@ -87,11 +97,9 @@ const deleteUser = (req, res, next) => {
   const deleteID = req.params.uid;
   const updatedUsers = DUMMY_DATA.users.filter(user => user.id !== deleteID);
   const deletedUser = { ...DUMMY_DATA.users.find(user => user.id === deleteID) };
-  console.log(updatedUsers);
-  console.log(deletedUser);
-  // DUMMY_DATA[0] = updatedUsers;
+
   DUMMY_DATA.users = updatedUsers;
-  console.log(DUMMY_DATA);
+
 
   res.status(200).json({ deletedUser });
 }
