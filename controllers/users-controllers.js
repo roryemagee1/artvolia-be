@@ -1,5 +1,6 @@
 const HttpError = require('../models/http-error');
 const SignUp = require('../models/sign-up');
+const { validationResult } = require('express-validator');
 
 // const DUMMY_DATA = require('../data/dummy-data');
 let DUMMY_DATA = require('../data/dummy-data');
@@ -75,6 +76,14 @@ const loginUser = (req, res, next) => {
 }
 
 const signUpUser = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    const error = new HttpError('Invalid inputs sent.', 422);
+    return next(error);
+  }
+
   const { email, userName, firstName, lastName, password } = req.body;
   
   const existingUser = DUMMY_DATA.users.find(user => user.userName === userName);

@@ -1,4 +1,5 @@
 const express = require('express');
+const { check } = require('express-validator');
 
 const router = express.Router();
 
@@ -17,7 +18,17 @@ router.get('/users/:uid', usersControllers.getUserByID);
 // Auth Routes
 router.patch('/login', usersControllers.loginUser);
 
-router.post('/sign-up', usersControllers.signUpUser);
+router.post(
+  '/sign-up', 
+  [ 
+    check(['email', 'userName', 'firstName', 'lastName', 'password'])
+      .not()
+      .isEmpty(),
+    check('password')
+      .isLength({ min: 5 })
+  ],
+  usersControllers.signUpUser
+);
 
 // Feed Routes
 // router.get('/feed'); // Will retrieve a list of all posts.
