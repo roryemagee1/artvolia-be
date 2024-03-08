@@ -24,6 +24,9 @@ router.post(
     check(['email', 'userName', 'firstName', 'lastName', 'password'])
       .not()
       .isEmpty(),
+    check('email')
+      .normalizeEmail()
+      .isEmail(),
     check('password')
       .isLength({ min: 5 })
   ],
