@@ -77,11 +77,10 @@ const loginUser = (req, res, next) => {
 const signUpUser = (req, res, next) => {
   const { email, userName, firstName, lastName, password } = req.body;
   
-  console.log(DUMMY_DATA);
-  const userIndex = DUMMY_DATA.users.findIndex(user => user.userName === userName);
-  console.log(userIndex);
+  const existingUser = DUMMY_DATA.users.find(user => user.userName === userName);
+  console.log(existingUser);
 
-  if (userIndex !== -1) {
+  if (existingUser) {
     const error = new HttpError('That username is already in use.', 401);
     return next(error);
   }
@@ -99,7 +98,6 @@ const deleteUser = (req, res, next) => {
   const deletedUser = { ...DUMMY_DATA.users.find(user => user.id === deleteID) };
 
   DUMMY_DATA.users = updatedUsers;
-
 
   res.status(200).json({ deletedUser });
 }
