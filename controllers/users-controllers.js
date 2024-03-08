@@ -54,28 +54,31 @@ const getUserByID = (req, res, next) => {
 
 }
 
-const loginUserByID = (req, res, next) => {
-  const userID = req.body.id;
-  let updatedUser = { ...DUMMY_DATA.users.find(user => user.id === userID) };
-  let userIndex = DUMMY_DATA.users.findIndex(user => user.id === userID);
+const loginUser = (req, res, next) => {
+  const userName = req.body.userName;
+  const password = req.body.password;
 
-  if (userIndex === -1) {
-    const error = new HttpError('Could not find a user with the given userID', 404);
+  const user = DUMMY_DATA.users.find(user => user.userName === userName);
+  console.log(user);
+  const userIndex = DUMMY_DATA.users.findIndex(user => user.userName === userName);
+  console.log(userIndex);
+
+  if (userIndex === -1 || user.settings.information.password !== password) {
+    const error = new HttpError('Could not find a user with the given username and password.', 401);
     return next(error);
   }
 
+  let updatedUser = { ...user };
+
   updatedUser.loggedIn = !updatedUser.loggedIn;
   DUMMY_DATA.users[userIndex] = updatedUser;
-  console.log(DUMMY_DATA);
 
   res.json({ updatedUser });
 }
 
 const signUpUser = (req, res, next) => {
   const newUser = new SignUp(req.body)
-  console.log(newUser);
   DUMMY_DATA.users.push(newUser);
-  console.log(DUMMY_DATA);
 
   res.status(201).json({ newUser });
 }
@@ -98,6 +101,6 @@ const deleteUser = (req, res, next) => {
 
 exports.getAllUsers = getAllUsers;
 exports.getUserByID = getUserByID;
-exports.loginUserByID = loginUserByID;
+exports.loginUser = loginUser;
 exports.signUpUser = signUpUser;
 exports.deleteUser = deleteUser;

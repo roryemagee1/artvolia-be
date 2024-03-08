@@ -15,7 +15,7 @@ router.get('/users/:uid', usersControllers.getUserByID);
 // router.get('/public/profile/:uid); // Will get a certain user's public profile if it is available.
 
 // Auth Routes
-router.patch('/login', usersControllers.loginUserByID);
+router.patch('/login', usersControllers.loginUser);
 
 router.post('/sign-up', usersControllers.signUpUser);
 
@@ -51,9 +51,6 @@ router.delete('/users/user/:uid', usersControllers.deleteUser); // This will be 
 
 // router.get('/settings/:uid'); // This will get the current user's settings.
 // router.patch('/settings/:uid/:option); // This will update the the setting specified at the end of the URL.
-
-
-
 
 
 module.exports = router;
