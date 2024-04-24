@@ -26,6 +26,13 @@ const getUserById = (req, res, next) => {
 
 const signup = (req, res, next) => {
   const { email, userName, firstName, lastName, password } = req.body;
+  const user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+  if (user) {
+    const error = new HttpError("The provided username is already in use.", 422);
+    return next(error);
+  }
+
   const newUser = new SignUp(email, userName, firstName, lastName, password);
   DUMMY_DATA.users.push(newUser);
 
@@ -38,7 +45,7 @@ const login = (req, res, next) => {
   let user = DUMMY_DATA.users.find(user => user.userName === userName);
 
   if (!user || user.settings.information.password !== password) {
-    const error = new HttpError("No user with that username and password combination was found.", 404);
+    const error = new HttpError("No user with that username and password combination was found.", 401);
     return next(error);
   }
 
