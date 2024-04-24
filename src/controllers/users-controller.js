@@ -28,16 +28,61 @@ const signup = (req, res, next) => {
   const { email, userName, firstName, lastName, password } = req.body;
   const newUser = new SignUp(email, userName, firstName, lastName, password);
   DUMMY_DATA.users.push(newUser);
-  console.log(DUMMY_DATA);
 
   return res.status(201).json({ newUser: newUser });
 };
 
 const login = (req, res, next) => {
-  next();
+  const { userName, password } = req.body;
+
+  let user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+  if (!user || user.settings.information.password !== password) {
+    const error = new HttpError("No user with that username and password combination was found.", 404);
+    return next(error);
+  }
+
+    DUMMY_DATA.users.map(user => {
+      if (user.userName === userName) {
+        user.loggedIn = true;
+        return user;
+      }
+      return user;
+    });
+    return res.status(200).json({ 
+      message: "Login successful!",
+      login: user.loggedIn
+      });
+    console.log(DUMMY_DATA);
+};
+
+const logout = (req, res, next) => {
+  const { userName } = req.body;
+
+  let user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+  if (!user ) {
+    const error = new HttpError("An unknown error has occurred.", 404);
+    return next(error);
+  }
+
+  user.loggedIn = false;
+
+  DUMMY_DATA.users.map(user => {
+    if (user.userName === userName) {
+      user.loggedIn = false
+      return user;
+    }
+    return user;
+  });
+  return res.status(200).json({ 
+    message: "Logout successful!",
+    login: user.loggedIn
+    });
 };
 
 exports.getUsers = getUsers;
 exports.getUserById = getUserById;
 exports.signup = signup;
 exports.login = login;
+exports.logout = logout;
