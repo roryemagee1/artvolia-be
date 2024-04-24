@@ -2,6 +2,7 @@ const HttpError = require('../models/http-error');
 const DUMMY_DATA = require('../data/dummy-data');
 const uuid = require('uuid');
 const SignUp = require('../models/sign-up');
+const { validationResult } = require('express-validator');
 
 const getUsers = (req, res, next) => {
   const users = DUMMY_DATA.users;
@@ -25,6 +26,11 @@ const getUserById = (req, res, next) => {
 }
 
 const signup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError(`Invalid ${errors.errors[0].path} value.`, 422));
+  }
+
   const { email, userName, firstName, lastName, password } = req.body;
   const user = DUMMY_DATA.users.find(user => user.userName === userName);
 
