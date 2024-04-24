@@ -1,4 +1,4 @@
-const SignUp = require('../src/models/sign-up');
+const SignUp = require('../models/sign-up');
 // { email, userName, firstName, lastName, password }
 
 const user2 = new SignUp('bob@smith.com', 'BobSmith', 'Bob', 'Smith');
