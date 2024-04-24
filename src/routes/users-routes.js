@@ -9,9 +9,9 @@ router.get('/', usersController.getUsers);
 
 router.get('/:uid', usersController.getUserById);
 
-// router.post('/signup', console.log("Sign-up requested!"));
+router.post('/signup', usersController.signup);
 
-// router.post('/login', console.log("Login requested!"));
+router.post('/login', usersController.login);
 
 
 module.exports = router;
