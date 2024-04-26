@@ -42,6 +42,7 @@ const DUMMY_DATA = {
       },
       posts: [
         {
+          userID: 'u-1',
           postID: 'p-baa98b89-11d1-41a0-9d80-d3a817532f88',
           postVisibility: 'public',
           postStatus: 'active',

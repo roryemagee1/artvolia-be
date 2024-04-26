@@ -13,14 +13,11 @@ router.get('/:uid/:pid', postsController.getPostByUserId);
 router.post(
   '/:uid/create-post', 
   [
-    check('creator')
+    check('postText')
       .not()
       .isEmpty(),
-    check('text')
-      .not()
-      .isEmpty(),
-    check('text')
-      .isLength({ max: 240 })
+    /*check('text')
+      .isLength({ max: 240 })*/
   ],
   postsController.createPost);
 
