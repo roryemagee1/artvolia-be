@@ -4,19 +4,6 @@ const uuid = require('uuid');
 const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 
-// Users
-const getUserById = (req, res, next) => {
-  const userID = req.params.uid;
-  const user = DUMMY_DATA.users.find(user => user.userID === userID);
-  
-  if (!user) {
-    return next(new HttpError("Could not find a user with the provided user ID.", 404));
-  }
-
-  res.json({userName: `${user.userName}`});
-}
-
-// Posts
 const getPostsByUserId = (req, res, next) => {
   const userID = req.params.uid;
   const user = DUMMY_DATA.users.find(user => user.userID === userID);
@@ -32,23 +19,42 @@ const getPostsByUserId = (req, res, next) => {
   res.status(200).json(user.posts);
 }
 
-const getPostByUserId = (req, res, next) => {
-  const userID = req.params.uid;
-  const postID = req.params.pid;
-  const user = DUMMY_DATA.users.find(user => user.userID === userID);
-  
-  if (!user) {
-   return next(new HttpError("Could not find a user with the provided user ID.", 404));
-  }
 
-  const post = user.posts.find(post => post.postID === postID);
+const getPostByUserId = async (req, res, next) => {
+  const postID = req.params.pid;
+
+  let post;
+  try {
+    post = await Post.findById(postID);
+  } catch(err) {
+    const error = new HttpError("Something went wrong. Could not find a post.", 500);
+    return next(error);
+  }
 
   if (!post) {
     return next(new HttpError("Could not find a post with the provided post ID.", 404));
    }
 
-  res.status(200).json(post);
+  res.status(200).json({ post: post });
 }
+
+// const getPostByUserId = (req, res, next) => {
+//   const userID = req.params.uid;
+//   const postID = req.params.pid;
+//   const user = DUMMY_DATA.users.find(user => user.userID === userID);
+  
+//   if (!user) {
+//    return next(new HttpError("Could not find a user with the provided user ID.", 404));
+//   }
+
+//   const post = user.posts.find(post => post.postID === postID);
+
+//   if (!post) {
+//     return next(new HttpError("Could not find a post with the provided post ID.", 404));
+//    }
+
+//   res.status(200).json(post);
+// }
 
 
 
@@ -195,8 +201,6 @@ const deletePostByUserId = (req, res, next) => {
   res.status(200).json({ message: "Post deleted!", post});
 }
 
-// exports.feedController = {getUserById, getPostsByUserId};
-exports.getUserById = getUserById;
 exports.getPostsByUserId = getPostsByUserId;
 exports.getPostByUserId = getPostByUserId;
 exports.deletePostByUserId = deletePostByUserId;
