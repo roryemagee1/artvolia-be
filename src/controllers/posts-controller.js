@@ -4,20 +4,36 @@ const uuid = require('uuid');
 const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 
-const getPostsByUserId = (req, res, next) => {
+const getPostsByUserId = async (req, res, next) => {
   const userID = req.params.uid;
   const user = DUMMY_DATA.users.find(user => user.userID === userID);
   
-  if (!user) {
-   return next(new HttpError("Could not find a user with the provided user ID.", 404));
+  let posts;
+  try {
+    posts = await Post.find({ userID: userID });
+  } catch(err) {
+    const error = new HttpError("Failed to fetch user's posts.", 500);
+    return next(error);
   }
 
-  if (!user.posts || user.posts.length === 0 ) {
-    return next(new HttpError("Could not find any posts associated with provided user ID", 404));
-  }
-
-  res.status(200).json(user.posts);
+  // res.status(200).json({posts: posts});
+  res.status(200).json({posts: posts.map(post => post.toObject({ getters:  true }))});
 }
+
+// const getPostsByUserId = (req, res, next) => {
+//   const userID = req.params.uid;
+//   const user = DUMMY_DATA.users.find(user => user.userID === userID);
+  
+//   if (!user) {
+//    return next(new HttpError("Could not find a user with the provided user ID.", 404));
+//   }
+
+//   if (!user.posts || user.posts.length === 0 ) {
+//     return next(new HttpError("Could not find any posts associated with provided user ID", 404));
+//   }
+
+//   res.status(200).json(user.posts);
+// }
 
 
 const getPostByUserId = async (req, res, next) => {
