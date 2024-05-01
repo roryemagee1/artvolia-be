@@ -5,15 +5,31 @@ const SignUp = require('../models/sign-up');
 const { validationResult } = require('express-validator');
 const User = require('../models/user');
 
-const getUsers = (req, res, next) => {
-  const users = DUMMY_DATA.users;
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError("Fetching users failed. Please try again later.", 500);
+    return next(error);
+  }
   
   if (!users) {
     return next(new HttpError("Requested data not available.", 404));
   }
 
-  res.status(200).json({users: users});
+  res.status(200).json({ users: users.map(user => user.toObject({ getters: true })) });
 }
+
+// const getUsers = (req, res, next) => {
+//   const users = DUMMY_DATA.users;
+  
+//   if (!users) {
+//     return next(new HttpError("Requested data not available.", 404));
+//   }
+
+//   res.status(200).json({users: users});
+// }
 
 const getUserById = (req, res, next) => {
   const userID = req.params.uid;
@@ -37,7 +53,7 @@ const signup = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ userName: userName })
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Signing up failed.  Please try again later.", 500);
     return next(error);
   } 
@@ -63,7 +79,7 @@ const signup = async (req, res, next) => {
 
   try {
     await createdUser.save();
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Signing up failed. Please try again later.", 500);
     return next(error);
   }
@@ -97,7 +113,7 @@ const login = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ userName: userName })
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Login failed. Please try again later.", 500);
     return next(error);
   }
@@ -151,7 +167,7 @@ const logout = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ userName: userName })
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Logout failed. Please try again later.", 500);
     return next(error);
   }
@@ -160,7 +176,7 @@ const logout = async (req, res, next) => {
 
   try {
     await existingUser.save();
-  } catch(err) {
+  } catch (err) {
     const error = new HttpError("Something went wrong. Could not logout.", 500);
     return next(error);
   }
