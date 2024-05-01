@@ -84,11 +84,6 @@ const createPost = async (req, res, next) => {
 
   const { postText } = req.body;
   const userID = req.params.uid;
-  let moddedUser = DUMMY_DATA.users.find(user => user.userID === userID);
-
-  if (!moddedUser) {
-    return next(new HttpError("Could not find a user with the provided user ID.", 404));
-  }
 
   const createdPost = new Post({
     userID: userID,
@@ -103,21 +98,12 @@ const createPost = async (req, res, next) => {
     postComments: []
   })
 
-  // moddedUser.posts.push(createdPost);
-  // DUMMY_DATA.users.map(user => {
-  //   if (user.userID === userID) {
-  //     return moddedUser;
-  //   }
-  //   return user;
-  // });
-
   try {
     await createdPost.save();
   } catch(err) {
     const error = new HttpError("Creating post failed. Please try again.", 500);
     return next(error);
   }
-  
   
   res.status(201).json({ post: createdPost});
 };
@@ -156,66 +142,127 @@ const createPost = async (req, res, next) => {
 //   res.status(201).json({ post: createdPost});
 // };
 
-const updatePostByUserId = (req, res, next) => {
+const updatePostByUserId = async (req, res, next) => {
   const postText = req.body.postText;
   const userID = req.params.uid;
   const postID = req.params.pid;
-  const user = DUMMY_DATA.users.find(user => user.userID === userID);
   
-  if (!user) {
-   return next(new HttpError("Could not find a user with the provided user ID.", 404));
+  let post;
+  try {
+    post = await Post.findById(postID);
+  } catch(err) {
+    const error = new HttpError("Something went wrong. Could not update post.", 500);
+    return next(error);
   }
-
-  const post = user.posts.find(post => post.postID === postID);
 
   if (!post) {
     return next(new HttpError("Could not find a post with the provided post ID.", 404));
    }
 
-   const moddedPosts = user.posts.map(post => {
-    if (post.postID === postID) {
-      post.postText = postText;
-      return post;
-    }
-    return post;
-   });
-   DUMMY_DATA.users.map(user => {
-    if (user.userID === userID) {
-      user.posts = moddedPosts;
-      return user;
-    }
-    return user;
-  });
+  post.postText = postText;
 
-  res.status(201).json({ message: "Post updated!", moddedPosts});
+  try {
+    await post.save();
+  } catch(err) {
+    const error = new HttpError(
+      'Something went wrong. Could not update post', 500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({ updatedPost: post.toObject({ getters: true }) });
 }
 
-const deletePostByUserId = (req, res, next) => {
+// const updatePostByUserId = (req, res, next) => {
+//   const postText = req.body.postText;
+//   const userID = req.params.uid;
+//   const postID = req.params.pid;
+//   const user = DUMMY_DATA.users.find(user => user.userID === userID);
+  
+//   if (!user) {
+//    return next(new HttpError("Could not find a user with the provided user ID.", 404));
+//   }
+
+//   const post = user.posts.find(post => post.postID === postID);
+
+//   if (!post) {
+//     return next(new HttpError("Could not find a post with the provided post ID.", 404));
+//    }
+
+//    const moddedPosts = user.posts.map(post => {
+//     if (post.postID === postID) {
+//       post.postText = postText;
+//       return post;
+//     }
+//     return post;
+//    });
+//    DUMMY_DATA.users.map(user => {
+//     if (user.userID === userID) {
+//       user.posts = moddedPosts;
+//       return user;
+//     }
+//     return user;
+//   });
+
+//   res.status(201).json({ message: "Post updated!", moddedPosts});
+// }
+
+const deletePostByUserId = async (req, res, next) => {
   const userID = req.params.uid;
   const postID = req.params.pid;
-  const user = DUMMY_DATA.users.find(user => user.userID === userID);
   
-  if (!user) {
-   return next(new HttpError("Could not find a user with the provided user ID.", 404));
+  let post;
+  try {
+    post = await Post.findById(postID);
+  } catch(err) {
+    const error = new HttpError("Something went wrong. Could not delete post.", 500);
+    return next(error);
   }
-
-  const post = user.posts.find(post => post.postID === postID);
 
   if (!post) {
     return next(new HttpError("Could not find a post with the provided post ID.", 404));
    }
 
-   const moddedPosts = user.posts.filter(post => post.postID !== postID);
-   DUMMY_DATA.users.map(user => {
-    if (user.userID === userID) {
-      user.posts = moddedPosts;
-      return user;
-    }
-    return user;
-  });
+  try {
+    // await post.remove(); Use deleteOne() instead of remove().
+    await post.deleteOne();
+    // await post.save();
+  } catch(err) {
+    const error = new HttpError(
+      'Something went wrong. Could not delete post.', 500
+    );
+    return next(error);
+  }
 
-  res.status(200).json({ message: "Post deleted!", post});
+  res.status(200).json({ message: "Post deleted!", post: post.toObject({ getters: true }) });
 }
+
+// const deletePostByUserId = (req, res, next) => {
+//   const userID = req.params.uid;
+//   const postID = req.params.pid;
+//   const user = DUMMY_DATA.users.find(user => user.userID === userID);
+  
+//   if (!user) {
+//    return next(new HttpError("Could not find a user with the provided user ID.", 404));
+//   }
+
+//   const post = user.posts.find(post => post.postID === postID);
+
+//   if (!post) {
+//     return next(new HttpError("Could not find a post with the provided post ID.", 404));
+//    }
+
+//    const moddedPosts = user.posts.filter(post => post.postID !== postID);
+//    DUMMY_DATA.users.map(user => {
+//     if (user.userID === userID) {
+//       user.posts = moddedPosts;
+//       return user;
+//     }
+//     return user;
+//   });
+
+//   res.status(200).json({ message: "Post deleted!", post});
+// }
 
 exports.getPostsByUserId = getPostsByUserId;
 exports.getPostByUserId = getPostByUserId;
