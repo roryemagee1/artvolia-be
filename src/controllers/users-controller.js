@@ -3,6 +3,7 @@ const DUMMY_DATA = require('../data/dummy-data');
 const uuid = require('uuid');
 const SignUp = require('../models/sign-up');
 const { validationResult } = require('express-validator');
+const User = require('../models/user');
 
 const getUsers = (req, res, next) => {
   const users = DUMMY_DATA.users;
@@ -25,25 +26,70 @@ const getUserById = (req, res, next) => {
   res.json({userName: `${user.userName}`});
 }
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new HttpError(`Invalid ${errors.errors[0].path} value.`, 422));
   }
 
   const { email, userName, firstName, lastName, password } = req.body;
-  const user = DUMMY_DATA.users.find(user => user.userName === userName);
 
-  if (user) {
-    const error = new HttpError("The provided username is already in use.", 422);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ userName: userName })
+  } catch(err) {
+    const error = new HttpError("Signing up failed.  Please try again later.", 500);
+    return next(error);
+  } 
+
+  if (existingUser) {
+    const error = new HttpError("Username already exists.", 422);
     return next(error);
   }
 
-  const newUser = new SignUp(email, userName, firstName, lastName, password);
-  DUMMY_DATA.users.push(newUser);
+  const createdUser = new User({
+    userID: "u" + uuid.v4(),
+    userName,
+    email,
+    firstName,
+    lastName,
+    password,
+    profileImage: "../data/butterfly.png",
+    profileStatus: "active",
+    created: Date.now(),
+    posts: "posts",
+    loggedIn: true
+  });
 
-  return res.status(201).json({ newUser: newUser });
+  try {
+    await createdUser.save();
+  } catch(err) {
+    const error = new HttpError("Signing up failed. Please try again later.", 500);
+    return next(error);
+  }
+  
+  res.status(201).json({ newUser: createdUser.toObject({ getters: true })});
 };
+
+// const signup = (req, res, next) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return next(new HttpError(`Invalid ${errors.errors[0].path} value.`, 422));
+//   }
+
+//   const { email, userName, firstName, lastName, password } = req.body;
+//   const user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+//   if (user) {
+//     const error = new HttpError("The provided username is already in use.", 422);
+//     return next(error);
+//   }
+
+//   const newUser = new SignUp(email, userName, firstName, lastName, password);
+//   DUMMY_DATA.users.push(newUser);
+
+//   return res.status(201).json({ newUser: newUser });
+// };
 
 const login = (req, res, next) => {
   const { userName, password } = req.body;
@@ -66,7 +112,6 @@ const login = (req, res, next) => {
       message: "Login successful!",
       login: user.loggedIn
       });
-    console.log(DUMMY_DATA);
 };
 
 const logout = (req, res, next) => {

@@ -7,11 +7,11 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     userID: { type: String, required: true },
     userName: { type: String, required: true, unique: true },
-    password: { type: String, required: true, minlength: 6 },
-    profileImage: { type: String },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
+    password: { type: String, required: true, minlength: 6 },
+    profileImage: { type: String },
     profileStatus: { type: String, required: true },
     created: { type: String, required: true },
     posts: { type: String, required: true },
