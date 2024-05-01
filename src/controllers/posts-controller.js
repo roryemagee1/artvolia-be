@@ -1,8 +1,11 @@
-const HttpError = require('../models/http-error');
 const DUMMY_DATA = require('../data/dummy-data');
 const uuid = require('uuid');
+
+const HttpError = require('../models/http-error');
+const mongoose = require('mongoose');
 const { validationResult } = require('express-validator');
 const Post = require('../models/post');
+const User = require('../models/user');
 
 const getPostsByUserId = async (req, res, next) => {
   const userID = req.params.uid;
@@ -82,8 +85,7 @@ const createPost = async (req, res, next) => {
     return next(new HttpError("Invalid inputs passed. Please check your data.", 422));
   }
 
-  const { postText } = req.body;
-  const userID = req.params.uid;
+  const { postText, userID } = req.body;
 
   const createdPost = new Post({
     userID: userID,
@@ -96,10 +98,28 @@ const createPost = async (req, res, next) => {
     postText: postText,
     postLikes: 0,
     postComments: []
-  })
+  });
+
+  let user;
+  try {
+    user = await User.findById(userID);
+  } catch (err) {
+    const error = new HttpError("Creating post failed. Please try again.", 500);
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError("Could not find a user for the provided user ID.", 404);
+    return next(error);
+  }
 
   try {
-    await createdPost.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPost.save({ session: sess });
+    user.posts.push(createdPost);
+    await user.save({ session: sess });
+    sess.commitTransaction();
   } catch(err) {
     const error = new HttpError("Creating post failed. Please try again.", 500);
     return next(error);

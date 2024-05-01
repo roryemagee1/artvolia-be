@@ -14,7 +14,7 @@ const userSchema = new Schema({
     profileImage: { type: String },
     profileStatus: { type: String, required: true },
     created: { type: String, required: true },
-    posts: { type: String, required: true },
+    posts: [{ type: mongoose.Types.ObjectId, required: true, ref: "Post" }],
     loggedIn: { type: Boolean, required: true }
 });
 

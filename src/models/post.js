@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
-  userID: { type: String, required: true },
+  // userID: { type: String, required: true },
+  userID: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
   postID: { type: String, required: true },
   postVisibility: { type: String, required: true },
   postStatus: { type: String, required: true},

@@ -73,7 +73,7 @@ const signup = async (req, res, next) => {
     profileImage: "../data/butterfly.png",
     profileStatus: "active",
     created: Date.now(),
-    posts: "posts",
+    posts: [],
     loggedIn: true
   });
 
