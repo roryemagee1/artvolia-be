@@ -145,30 +145,56 @@ const login = async (req, res, next) => {
 //     });
 // };
 
-const logout = (req, res, next) => {
+const logout = async (req, res, next) => {
   const { userName } = req.body;
 
-  let user = DUMMY_DATA.users.find(user => user.userName === userName);
-
-  if (!user ) {
-    const error = new HttpError("An unknown error has occurred.", 404);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ userName: userName })
+  } catch(err) {
+    const error = new HttpError("Logout failed. Please try again later.", 500);
     return next(error);
   }
+  
+  existingUser.loggedIn = false;
 
-  user.loggedIn = false;
-
-  DUMMY_DATA.users.map(user => {
-    if (user.userName === userName) {
-      user.loggedIn = false
-      return user;
-    }
-    return user;
-  });
-  return res.status(200).json({ 
+  try {
+    await existingUser.save();
+  } catch(err) {
+    const error = new HttpError("Something went wrong. Could not logout.", 500);
+    return next(error);
+  }
+    
+  res.status(200).json({ 
     message: "Logout successful!",
-    login: user.loggedIn
-    });
+    loginStatus: existingUser.toObject({ getters: true }).loggedIn
+  });
 };
+
+// const logout = (req, res, next) => {
+//   const { userName } = req.body;
+
+//   let user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+//   if (!user ) {
+//     const error = new HttpError("An unknown error has occurred.", 404);
+//     return next(error);
+//   }
+
+//   user.loggedIn = false;
+
+//   DUMMY_DATA.users.map(user => {
+//     if (user.userName === userName) {
+//       user.loggedIn = false
+//       return user;
+//     }
+//     return user;
+//   });
+//   return res.status(200).json({ 
+//     message: "Logout successful!",
+//     login: user.loggedIn
+//     });
+// };
 
 exports.getUsers = getUsers;
 exports.getUserById = getUserById;
