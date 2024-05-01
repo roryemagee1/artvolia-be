@@ -48,7 +48,7 @@ const signup = async (req, res, next) => {
   }
 
   const createdUser = new User({
-    userID: "u" + uuid.v4(),
+    userID: "u-" + uuid.v4(),
     userName,
     email,
     firstName,
@@ -91,28 +91,59 @@ const signup = async (req, res, next) => {
 //   return res.status(201).json({ newUser: newUser });
 // };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { userName, password } = req.body;
 
-  let user = DUMMY_DATA.users.find(user => user.userName === userName);
-
-  if (!user || user.settings.information.password !== password) {
-    const error = new HttpError("No user with that username and password combination was found.", 401);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ userName: userName })
+  } catch(err) {
+    const error = new HttpError("Login failed. Please try again later.", 500);
     return next(error);
   }
 
-    DUMMY_DATA.users.map(user => {
-      if (user.userName === userName) {
-        user.loggedIn = true;
-        return user;
-      }
-      return user;
-    });
-    return res.status(200).json({ 
-      message: "Login successful!",
-      login: user.loggedIn
-      });
+  if (!existingUser || existingUser.password !== password) {
+    const error = new HttpError("Invalid credentials. Could not log in.", 401);
+    return next(error);
+  }
+  
+  existingUser.loggedIn = true;
+
+  try {
+    await existingUser.save();
+  } catch(err) {
+    const error = new HttpError("Something went wrong. Could not log in.", 500);
+    return next(error);
+  }
+    
+  res.status(200).json({ 
+    message: "Login successful!",
+    loginStatus: existingUser.toObject({ getters: true }).loggedIn
+  });
 };
+
+// const login = (req, res, next) => {
+//   const { userName, password } = req.body;
+
+//   let user = DUMMY_DATA.users.find(user => user.userName === userName);
+
+//   if (!user || user.settings.information.password !== password) {
+//     const error = new HttpError("No user with that username and password combination was found.", 401);
+//     return next(error);
+//   }
+
+//     DUMMY_DATA.users.map(user => {
+//       if (user.userName === userName) {
+//         user.loggedIn = true;
+//         return user;
+//       }
+//       return user;
+//     });
+//     return res.status(200).json({ 
+//       message: "Login successful!",
+//       login: user.loggedIn
+//     });
+// };
 
 const logout = (req, res, next) => {
   const { userName } = req.body;

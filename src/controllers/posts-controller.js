@@ -165,7 +165,7 @@ const updatePostByUserId = async (req, res, next) => {
     await post.save();
   } catch(err) {
     const error = new HttpError(
-      'Something went wrong. Could not update post', 500
+      "Something went wrong. Could not update post", 500
     );
     return next(error);
   }
