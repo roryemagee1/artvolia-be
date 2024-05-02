@@ -1,4 +1,3 @@
-const DUMMY_DATA = require('../data/dummy-data');
 const uuid = require('uuid');
 
 const HttpError = require('../models/http-error');
@@ -9,18 +8,30 @@ const User = require('../models/user');
 
 const getPostsByUserId = async (req, res, next) => {
   const userID = req.params.uid;
-  const user = DUMMY_DATA.users.find(user => user.userID === userID);
   
-  let posts;
+  // let posts;
+  // try {
+  //   posts = await Post.find({ userID: userID });
+  // } catch(err) {
+  //   const error = new HttpError("Failed to fetch user's posts.", 500);
+  //   return next(error);
+  // }
+  // res.status(200).json({posts: posts.map(post => post.toObject({ getters:  true }))});
+
+  let userWithPosts;
   try {
-    posts = await Post.find({ userID: userID });
+    userWithPosts = await Post.findById(userID).populate('posts');
   } catch(err) {
     const error = new HttpError("Failed to fetch user's posts.", 500);
     return next(error);
   }
 
-  // res.status(200).json({posts: posts});
-  res.status(200).json({posts: posts.map(post => post.toObject({ getters:  true }))});
+  if (!userWithPosts || userWithPosts.posts.length === 0) {
+    const error = new HttpError("Could not find posts for the provided user ID.", 404);
+    return next(error);
+  }
+
+  res.status(200).json({posts: userWithPosts.map(post => post.toObject({ getters:  true }))});
 }
 
 // const getPostsByUserId = (req, res, next) => {
@@ -75,9 +86,6 @@ const getPostByUserId = async (req, res, next) => {
 //   res.status(200).json(post);
 // }
 
-
-
-
 const createPost = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -127,8 +135,6 @@ const createPost = async (req, res, next) => {
   
   res.status(201).json({ post: createdPost});
 };
-
-
 
 // const createPost = (req, res, next) => {
 //   const errors = validationResult(req);
@@ -228,12 +234,11 @@ const updatePostByUserId = async (req, res, next) => {
 // }
 
 const deletePostByUserId = async (req, res, next) => {
-  const userID = req.params.uid;
   const postID = req.params.pid;
   
   let post;
   try {
-    post = await Post.findById(postID);
+    post = await Post.findById(postID).populate("userID");
   } catch(err) {
     const error = new HttpError("Something went wrong. Could not delete post.", 500);
     return next(error);
@@ -244,9 +249,12 @@ const deletePostByUserId = async (req, res, next) => {
    }
 
   try {
-    // await post.remove(); Use deleteOne() instead of remove().
-    await post.deleteOne();
-    // await post.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await post.deleteOne({ session: sess }); // Use deleteOne() instead of remove().
+    await post.userID.posts.pull(post); 
+    await post.userID.save({ session: sess });
+    sess.commitTransaction();
   } catch(err) {
     const error = new HttpError(
       'Something went wrong. Could not delete post.', 500
