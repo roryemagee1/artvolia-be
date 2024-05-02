@@ -16,8 +16,8 @@ router.post(
     check('postText')
       .not()
       .isEmpty(),
-    /*check('text')
-      .isLength({ max: 240 })*/
+    check('postText')
+      .isLength({ max: 240 })
   ],
   postsController.createPost);
 

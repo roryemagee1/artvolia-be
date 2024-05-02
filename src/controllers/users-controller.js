@@ -1,7 +1,5 @@
 const HttpError = require('../models/http-error');
-const DUMMY_DATA = require('../data/dummy-data');
 const uuid = require('uuid');
-const SignUp = require('../models/sign-up');
 const { validationResult } = require('express-validator');
 const User = require('../models/user');
 
@@ -44,7 +42,7 @@ const signup = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ userName: userName })
   } catch (err) {
-    const error = new HttpError("Signing up failed.  Please try again later.", 500);
+    const error = new HttpError("Signing up failed. Please try again later.", 500);
     return next(error);
   } 
 
@@ -54,7 +52,6 @@ const signup = async (req, res, next) => {
   }
 
   const createdUser = new User({
-    userID: "u-" + uuid.v4(),
     userName,
     email,
     firstName,
