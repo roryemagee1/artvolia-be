@@ -32,9 +32,9 @@ router.post(
   ], 
   usersController.signup);
 
-router.post('/login', usersController.login);
+router.patch('/login', usersController.login);
 
-router.post('/logout', usersController.logout);
+router.patch('/logout', usersController.logout);
 
 
 module.exports = router;
